@@ -1,2 +1,9 @@
 server:
   port: 8088
+
+spring:
+  datasource:
+    type: com.mchange.v2.c3p0.ComboPooledDataSource
+  jpa:
+    hibernate:
+      ddl-auto: update
