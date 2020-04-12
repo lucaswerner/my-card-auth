@@ -24,11 +24,6 @@ class User {
     private String password;
     private boolean enabled = true;
     private LocalDate lastLogin;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Collection<Role> roles;
+    private String role;
 
 }

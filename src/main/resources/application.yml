@@ -6,4 +6,4 @@ spring:
     type: com.mchange.v2.c3p0.ComboPooledDataSource
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop

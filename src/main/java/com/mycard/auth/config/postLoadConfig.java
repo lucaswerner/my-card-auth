@@ -1,17 +1,12 @@
 package com.mycard.auth.config;
 
-import com.mycard.auth.entity.Privilege;
-import com.mycard.auth.entity.Role;
 import com.mycard.auth.entity.User;
-import com.mycard.auth.repository.PrivilegeRepository;
-import com.mycard.auth.repository.RoleRepository;
 import com.mycard.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Configuration
@@ -21,38 +16,38 @@ public class postLoadConfig {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void setUp() {
         final String email = "lucaswerner26@gmail.com";
-
         final Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        if (optionalUser.isPresent()) {
-            return;
+        if (optionalUser.isEmpty()) {
+
+            final User user = new User();
+
+            user.setEmail(email);
+            user.setName("admin");
+            user.setPassword(passwordEncoder.encode("admin"));
+            user.setRole("ROLE_ADMIN");
+
+            userRepository.save(user);
         }
 
-        final Privilege read = privilegeRepository.save(new Privilege("READ"));
-        final Privilege update = privilegeRepository.save(new Privilege("UPDATE"));
-        final Privilege delete = privilegeRepository.save(new Privilege("DELETE"));
-        final Privilege write = privilegeRepository.save(new Privilege("WRITE"));
+        final String userEmail = "user@gmail.com";
+        final Optional<User> optionalUser2 = userRepository.findByEmail(userEmail);
 
-        final Role admin = roleRepository.save(new Role("ADMIN", Arrays.asList(read, update, delete, write)));
+        if (optionalUser2.isEmpty()) {
 
-        final User user = new User();
+            final User user2 = new User();
 
-        user.setEmail(email);
-        user.setName("admin");
-        user.setPassword(passwordEncoder.encode("admin"));
-        user.setRoles(Arrays.asList(admin));
+            user2.setEmail(userEmail);
+            user2.setName("user");
+            user2.setPassword(passwordEncoder.encode("user"));
+            user2.setRole("ROLE_USER");
 
-        userRepository.save(user);
+            userRepository.save(user2);
+        }
     }
 }
