@@ -12,10 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
-public class postLoadConfig {
+public class PostLoadConfig {
 
     @Autowired
     private UserRepository userRepository;
@@ -31,28 +32,60 @@ public class postLoadConfig {
 
     @PostConstruct
     public void setUp() {
-        final String email = "lucaswerner26@gmail.com";
 
-        final Optional<User> optionalUser = userRepository.findByEmail(email);
+        // card privileges
+        final Privilege readCard = getOrSavePrivilege("READ_CARD");
+        final Privilege writeCard = getOrSavePrivilege("WRITE_CARD");
+        final Privilege updateCard = getOrSavePrivilege("UPDATE_CARD");
 
-        if (optionalUser.isPresent()) {
-            return;
+        // transaction privileges
+        final Privilege readTransaction = getOrSavePrivilege("READ_TRANSACTION");
+        final Privilege writeTransaction = getOrSavePrivilege("WRITE_TRANSACTION");
+        final Privilege updateTransaction = getOrSavePrivilege("UPDATE_TRANSACTION");
+
+        // auth privileges
+        final Privilege readAuth = getOrSavePrivilege("READ_AUTH");
+
+        final List<Privilege> userPrivileges = Arrays.asList(readCard, readTransaction);
+        final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, readAuth);
+        final List<Privilege> adminPrivileges = Arrays.asList(updateCard, updateTransaction);
+
+        final Role user = getOrSaveRole("USER", userPrivileges);
+        final Role system = getOrSaveRole("SYSTEM", systemPrivileges);
+        final Role admin = getOrSaveRole("ADMIN", adminPrivileges);
+
+        getOrSaveUser(new User(null, "user", "user@gmail.com", passwordEncoder.encode("user"), true, null, Arrays.asList(user)));
+        getOrSaveUser(new User(null, "system", "system@gmail.com", passwordEncoder.encode("system"), true, null, Arrays.asList(system, user)));
+        getOrSaveUser(new User(null, "admin", "admin@gmail.com", passwordEncoder.encode("admin"), true, null, Arrays.asList(user, system, admin)));
+    }
+
+    private Privilege getOrSavePrivilege(String name) {
+        final Optional<Privilege> optionalPrivilege = privilegeRepository.findByName(name);
+
+        if (optionalPrivilege.isPresent()) {
+            return optionalPrivilege.get();
         }
 
-        final Privilege read = privilegeRepository.save(new Privilege("READ"));
-        final Privilege update = privilegeRepository.save(new Privilege("UPDATE"));
-        final Privilege delete = privilegeRepository.save(new Privilege("DELETE"));
-        final Privilege write = privilegeRepository.save(new Privilege("WRITE"));
+        return privilegeRepository.save(new Privilege(name));
+    }
 
-        final Role admin = roleRepository.save(new Role("ADMIN", Arrays.asList(read, update, delete, write)));
+    private Role getOrSaveRole(String name, List<Privilege> privilegeList) {
+        final Optional<Role> optionalRole = roleRepository.findByName(name);
 
-        final User user = new User();
+        if (optionalRole.isPresent()) {
+            return optionalRole.get();
+        }
 
-        user.setEmail(email);
-        user.setName("admin");
-        user.setPassword(passwordEncoder.encode("admin"));
-        user.setRoles(Arrays.asList(admin));
+        return roleRepository.save(new Role(name, privilegeList));
+    }
 
-        userRepository.save(user);
+    private User getOrSaveUser(User user) {
+        final Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
+
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        }
+
+        return userRepository.save(user);
     }
 }
