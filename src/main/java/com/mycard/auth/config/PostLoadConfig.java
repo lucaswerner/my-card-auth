@@ -3,89 +3,74 @@ package com.mycard.auth.config;
 import com.mycard.auth.entity.Privilege;
 import com.mycard.auth.entity.Role;
 import com.mycard.auth.entity.User;
-import com.mycard.auth.repository.PrivilegeRepository;
-import com.mycard.auth.repository.RoleRepository;
-import com.mycard.auth.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mycard.auth.entity.UserDescription;
+import com.mycard.auth.service.PrivilegeService;
+import com.mycard.auth.service.RoleService;
+import com.mycard.auth.service.UserService;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Configuration
 public class PostLoadConfig {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final PrivilegeService privilegeService;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public PostLoadConfig(UserService userService, RoleService roleService, PrivilegeService privilegeService) {
+        this.userService = userService;
+        this.roleService = roleService;
+        this.privilegeService = privilegeService;
+    }
 
     @PostConstruct
     public void setUp() {
 
         // card privileges
-        final Privilege readCard = getOrSavePrivilege("READ_CARD");
-        final Privilege writeCard = getOrSavePrivilege("WRITE_CARD");
-        final Privilege updateCard = getOrSavePrivilege("UPDATE_CARD");
+        final Privilege readCard = privilegeService.getOrSavePrivilege("READ_CARD");
+        final Privilege writeCard = privilegeService.getOrSavePrivilege("WRITE_CARD");
+        final Privilege updateCard = privilegeService.getOrSavePrivilege("UPDATE_CARD");
 
         // transaction privileges
-        final Privilege readTransaction = getOrSavePrivilege("READ_TRANSACTION");
-        final Privilege writeTransaction = getOrSavePrivilege("WRITE_TRANSACTION");
-        final Privilege updateTransaction = getOrSavePrivilege("UPDATE_TRANSACTION");
+        final Privilege readTransaction = privilegeService.getOrSavePrivilege("READ_TRANSACTION");
+        final Privilege writeTransaction = privilegeService.getOrSavePrivilege("WRITE_TRANSACTION");
+        final Privilege updateTransaction = privilegeService.getOrSavePrivilege("UPDATE_TRANSACTION");
 
         // auth privileges
-        final Privilege readAuth = getOrSavePrivilege("READ_AUTH");
+        final Privilege readAuth = privilegeService.getOrSavePrivilege("READ_AUTH");
+        final Privilege writeAuth = privilegeService.getOrSavePrivilege("WRITE_AUTH");
+        final Privilege updateAuth = privilegeService.getOrSavePrivilege("UPDATE_AUTH");
 
-        final List<Privilege> userPrivileges = Arrays.asList(readCard, readTransaction);
-        final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, readAuth);
+        final List<Privilege> userPrivileges = Arrays.asList(readCard, readTransaction, readAuth, updateAuth);
+        final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, writeAuth);
         final List<Privilege> adminPrivileges = Arrays.asList(updateCard, updateTransaction);
 
-        final Role user = getOrSaveRole("USER", userPrivileges);
-        final Role system = getOrSaveRole("SYSTEM", systemPrivileges);
-        final Role admin = getOrSaveRole("ADMIN", adminPrivileges);
+        final Role user = roleService.getOrSaveRole(new Role("USER", userPrivileges));
+        final Role system = roleService.getOrSaveRole(new Role("SYSTEM", systemPrivileges));
+        final Role admin = roleService.getOrSaveRole(new Role("ADMIN", adminPrivileges));
 
-        getOrSaveUser(new User(null, "user", "user@gmail.com", passwordEncoder.encode("user"), true, null, Arrays.asList(user)));
-        getOrSaveUser(new User(null, "system", "system@gmail.com", passwordEncoder.encode("system"), true, null, Arrays.asList(system, user)));
-        getOrSaveUser(new User(null, "admin", "admin@gmail.com", passwordEncoder.encode("admin"), true, null, Arrays.asList(user, system, admin)));
+        final UserDescription userDescriptionA = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
+        final UserDescription userDescriptionB = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
+        final UserDescription userDescriptionC = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
+
+        getOrSaveUser(new User(null, "user@gmail.com", "user", true, null, null, userDescriptionA), Collections.singletonList(user));
+        getOrSaveUser(new User(null, "system@gmail.com", "system", true, null, null, userDescriptionB), Arrays.asList(system, user));
+        getOrSaveUser(new User(null, "admin@gmail.com", "admin", true, null, null, userDescriptionC), Arrays.asList(user, system, admin));
     }
 
-    private Privilege getOrSavePrivilege(String name) {
-        final Optional<Privilege> optionalPrivilege = privilegeRepository.findByName(name);
-
-        if (optionalPrivilege.isPresent()) {
-            return optionalPrivilege.get();
-        }
-
-        return privilegeRepository.save(new Privilege(name));
-    }
-
-    private Role getOrSaveRole(String name, List<Privilege> privilegeList) {
-        final Optional<Role> optionalRole = roleRepository.findByName(name);
-
-        if (optionalRole.isPresent()) {
-            return optionalRole.get();
-        }
-
-        return roleRepository.save(new Role(name, privilegeList));
-    }
-
-    private User getOrSaveUser(User user) {
-        final Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
+    private void getOrSaveUser(User user, List<Role> roleList) {
+        final Optional<User> optionalUser = userService.findByEmail(user.getEmail());
 
         if (optionalUser.isPresent()) {
-            return optionalUser.get();
+            return;
         }
 
-        return userRepository.save(user);
+        userService.saveUser(user, roleList);
     }
 }

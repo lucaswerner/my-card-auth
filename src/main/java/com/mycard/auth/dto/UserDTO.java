@@ -2,13 +2,14 @@ package com.mycard.auth.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public @Data
-class UserDTO {
+@Data
+public class UserDTO implements Serializable {
+    private static final long serialVersionUID = -2545289432224727076L;
     private Long id;
-    private String name;
     private String email;
-    private boolean enabled;
+    private Boolean enabled;
     private LocalDate lastLogin;
 }

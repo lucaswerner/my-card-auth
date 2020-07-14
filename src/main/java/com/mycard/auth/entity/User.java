@@ -18,11 +18,11 @@ class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
     @Column(unique = true)
     private String email;
+
     private String password;
-    private boolean enabled = true;
+    private Boolean enabled = Boolean.TRUE;
     private LocalDate lastLogin;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -30,5 +30,8 @@ class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserDescription userDescription;
 
 }

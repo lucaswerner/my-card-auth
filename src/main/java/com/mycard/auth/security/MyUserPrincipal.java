@@ -1,8 +1,8 @@
 package com.mycard.auth.security;
 
+import com.mycard.auth.dto.UserSecurityDTO;
 import com.mycard.auth.entity.Privilege;
 import com.mycard.auth.entity.Role;
-import com.mycard.auth.entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,9 +15,9 @@ import java.util.List;
 public @Data
 class MyUserPrincipal implements UserDetails {
 
-    private final User user;
+    private final UserSecurityDTO user;
 
-    public MyUserPrincipal(User user) {
+    public MyUserPrincipal(UserSecurityDTO user) {
         this.user = user;
     }
 

@@ -1,20 +1,25 @@
-package com.mycard.auth.security;
+package com.mycard.auth.service.impl;
 
+import com.mycard.auth.security.MyUserPrincipal;
 import com.mycard.auth.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
     private UserService userService;
+
+    public CustomUserDetailsServiceImpl(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return new MyUserPrincipal(userService.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email)));
+        return new MyUserPrincipal(
+                userService.findUserDTOByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException(email)));
     }
 }

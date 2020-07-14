@@ -1,40 +1,46 @@
 package com.mycard.auth.controller;
 
+import com.mycard.auth.dto.CompleteUserDTO;
+import com.mycard.auth.dto.PostUserDTO;
 import com.mycard.auth.dto.UserDTO;
-import com.mycard.auth.entity.User;
+import com.mycard.auth.security.MyUserPrincipal;
 import com.mycard.auth.service.UserService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.Optional;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("user")
 public class UserController {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private UserService userService;
 
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping
-    public Principal user(Principal user) {
-        return user;
+    public ResponseEntity<UserDTO> getUserData(
+            final Authentication authentication
+    ) {
+        return userService.findUserDTOById(((MyUserPrincipal) authentication.getPrincipal()).getUser().getId())
+                .map(userDTO -> ResponseEntity.ok().body(userDTO))
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<CompleteUserDTO> postUser(@Valid @RequestBody PostUserDTO postUserDTO) {
+        return ResponseEntity.ok().body(userService.saveUser(postUserDTO));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
-        final Optional<User> optionalUser = userService.findbyId(id);
-
-        return optionalUser
-                .map(user -> ResponseEntity.ok().body(modelMapper.map(user, UserDTO.class)))
+    public ResponseEntity<UserDTO> adminGetUserData(
+            @PathVariable("id") final Long pathVariableId
+    ) {
+        return userService.findUserDTOById(pathVariableId)
+                .map(userDTO -> ResponseEntity.ok().body(userDTO))
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }
