@@ -6,6 +6,7 @@ import com.mycard.auth.dto.UserDTO;
 import com.mycard.auth.dto.UserSecurityDTO;
 import com.mycard.auth.entity.Role;
 import com.mycard.auth.entity.User;
+import com.mycard.auth.entity.UserDescription;
 import com.mycard.auth.enumeration.RoleEnumeration;
 import com.mycard.auth.repository.UserRepository;
 import com.mycard.auth.service.RoleService;
@@ -57,6 +58,10 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User email already registered!");
         }
 
+        final UserDescription userDescription = user.getUserDescription();
+        if (userDescription != null) {
+            userDescription.setUser(user);
+        }
         user.setRoles(roleList);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

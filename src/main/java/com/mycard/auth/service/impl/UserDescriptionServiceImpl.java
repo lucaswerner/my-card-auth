@@ -39,7 +39,6 @@ public class UserDescriptionServiceImpl implements UserDescriptionService {
         final UserDescription userDescriptionFromDB = optionalUserDescription.get();
         userDescriptionFromDB.setFirstName(userDescription.getFirstName());
         userDescriptionFromDB.setLastName(userDescription.getLastName());
-        userDescriptionFromDB.setRegisterDt(userDescription.getRegisterDt());
         userDescriptionFromDB.setCcInvoiceDt(userDescription.getCcInvoiceDt());
         userDescriptionFromDB.setAddressStreet(userDescription.getAddressStreet());
         userDescriptionFromDB.setAddressNumber(userDescription.getAddressNumber());
@@ -55,7 +54,7 @@ public class UserDescriptionServiceImpl implements UserDescriptionService {
                 .map(this::transformUserDescriptionToUserDescriptionDTO);
     }
 
-    @CachePut(key = "{#id}")
+    @CachePut(key = "{#userDescriptionDTO.id}")
     @HystrixCommand(threadPoolKey = "findUserDescriptionDTOByIdThreadPool")
     public Optional<UserDescriptionDTO> updateUserDescriptionDTO(UserDescriptionDTO userDescriptionDTO) {
         return updateUserDescription(modelMapper.map(userDescriptionDTO, UserDescription.class))

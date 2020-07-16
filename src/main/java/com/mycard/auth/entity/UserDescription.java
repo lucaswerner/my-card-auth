@@ -18,22 +18,22 @@ public class UserDescription {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "register_date")
-    private LocalDateTime registerDt;
+    @Column(name = "register_date", nullable = false)
+    private LocalDateTime registerDt = LocalDateTime.now();
 
-    @Column(name = "cc_invoice_dt")
+    @Column(name = "cc_invoice_dt", nullable = false)
     private LocalDate ccInvoiceDt;
 
-    @Column(name = "address_street")
+    @Column(name = "address_street", nullable = false)
     private String addressStreet;
 
-    @Column(name = "address_number")
+    @Column(name = "address_number", nullable = false)
     private Integer addressNumber;
 
     @Column(name = "address_complement")

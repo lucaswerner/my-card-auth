@@ -51,17 +51,17 @@ public class PostLoadConfig {
         final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, writeAuth);
         final List<Privilege> adminPrivileges = Arrays.asList(updateCard, updateTransaction);
 
-        final Role user = roleService.getOrSaveRole(new Role("USER", userPrivileges));
-        final Role system = roleService.getOrSaveRole(new Role("SYSTEM", systemPrivileges));
-        final Role admin = roleService.getOrSaveRole(new Role("ADMIN", adminPrivileges));
+        final Role userRole = roleService.getOrSaveRole(new Role("USER", userPrivileges));
+        final Role systemRole = roleService.getOrSaveRole(new Role("SYSTEM", systemPrivileges));
+        final Role adminRole = roleService.getOrSaveRole(new Role("ADMIN", adminPrivileges));
 
         final UserDescription userDescriptionA = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
-        final UserDescription userDescriptionB = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
-        final UserDescription userDescriptionC = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
+        final User user = new User(null, "user@gmail.com", "user", true, null, null, userDescriptionA);
+        userDescriptionA.setUser(user);
 
-        getOrSaveUser(new User(null, "user@gmail.com", "user", true, null, null, userDescriptionA), Collections.singletonList(user));
-        getOrSaveUser(new User(null, "system@gmail.com", "system", true, null, null, userDescriptionB), Arrays.asList(system, user));
-        getOrSaveUser(new User(null, "admin@gmail.com", "admin", true, null, null, userDescriptionC), Arrays.asList(user, system, admin));
+        getOrSaveUser(user, Collections.singletonList(userRole));
+        getOrSaveUser(new User(null, "system@gmail.com", "system", true, null, null, null), Arrays.asList(systemRole, userRole));
+        getOrSaveUser(new User(null, "admin@gmail.com", "admin", true, null, null, null), Arrays.asList(userRole, systemRole, adminRole));
     }
 
     private void getOrSaveUser(User user, List<Role> roleList) {
