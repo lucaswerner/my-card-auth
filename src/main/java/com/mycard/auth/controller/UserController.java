@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> adminGetUserData(
+    public ResponseEntity<UserDTO> systemGetUserData(
             @PathVariable("id") final Long pathVariableId
     ) {
         return userService.findUserDTOById(pathVariableId)
