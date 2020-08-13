@@ -15,14 +15,15 @@ public @Data
 class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String name;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
-    private boolean enabled = true;
+    private Boolean enabled = Boolean.TRUE;
     private LocalDate lastLogin;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -30,5 +31,8 @@ class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserDescription userDescription;
 
 }

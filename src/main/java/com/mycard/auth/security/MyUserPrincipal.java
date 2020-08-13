@@ -1,8 +1,8 @@
 package com.mycard.auth.security;
 
+import com.mycard.auth.dto.UserSecurityDTO;
 import com.mycard.auth.entity.Privilege;
 import com.mycard.auth.entity.Role;
-import com.mycard.auth.entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,9 +15,9 @@ import java.util.List;
 public @Data
 class MyUserPrincipal implements UserDetails {
 
-    private final User user;
+    private final UserSecurityDTO user;
 
-    public MyUserPrincipal(User user) {
+    public MyUserPrincipal(UserSecurityDTO user) {
         this.user = user;
     }
 
@@ -53,31 +53,22 @@ class MyUserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getEnabled();
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(
             Collection<Role> roles) {
-        return getGrantedAuthorities(getPrivileges(roles));
+        return getGrantedAuthorities(roles);
     }
 
-    private List<String> getPrivileges(Collection<Role> roles) {
-
-        List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
-        for (Role role : roles) {
-            collection.addAll(role.getPrivileges());
-        }
-        for (Privilege item : collection) {
-            privileges.add(item.getName());
-        }
-        return privileges;
-    }
-
-    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+    private List<GrantedAuthority> getGrantedAuthorities(Collection<Role> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String privilege : privileges) {
-            authorities.add(new SimpleGrantedAuthority(privilege));
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+
+            for (Privilege privilege : role.getPrivileges()) {
+                authorities.add(new SimpleGrantedAuthority(privilege.getName()));
+            }
         }
         return authorities;
     }
