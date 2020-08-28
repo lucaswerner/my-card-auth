@@ -11,7 +11,6 @@ public class PostUserDTOToUser extends PropertyMap<PostUserDTO, User> {
         map().setPassword(source.getPassword());
         map().getUserDescription().setFirstName(source.getFirstName());
         map().getUserDescription().setLastName(source.getLastName());
-        map().getUserDescription().setCcInvoiceDt(source.getCcInvoiceDt());
         map().getUserDescription().setAddressStreet(source.getAddressStreet());
         map().getUserDescription().setAddressNumber(source.getAddressNumber());
         map().getUserDescription().setAddressComplement(source.getAddressComplement());

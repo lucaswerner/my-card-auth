@@ -11,7 +11,6 @@ public class UserDescriptionDTOToUserDescription extends PropertyMap<UserDescrip
         map().setFirstName(source.getFirstName());
         map().setLastName(source.getLastName());
         map().setRegisterDt(source.getRegisterDt());
-        map().setCcInvoiceDt(source.getCcInvoiceDt());
         map().setAddressStreet(source.getAddressStreet());
         map().setAddressNumber(source.getAddressNumber());
         map().setAddressComplement(source.getAddressComplement());

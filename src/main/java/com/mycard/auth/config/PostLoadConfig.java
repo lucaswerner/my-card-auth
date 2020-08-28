@@ -10,7 +10,6 @@ import com.mycard.auth.service.UserService;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -47,15 +46,20 @@ public class PostLoadConfig {
         final Privilege writeAuth = privilegeService.getOrSavePrivilege("WRITE_AUTH");
         final Privilege updateAuth = privilegeService.getOrSavePrivilege("UPDATE_AUTH");
 
-        final List<Privilege> userPrivileges = Arrays.asList(readCard, readTransaction, readAuth, updateAuth);
-        final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, writeAuth);
-        final List<Privilege> adminPrivileges = Arrays.asList(updateCard, updateTransaction);
+        // bill privileges
+        final Privilege readBill = privilegeService.getOrSavePrivilege("READ_BILL");
+        final Privilege writeBill = privilegeService.getOrSavePrivilege("WRITE_BILL");
+
+        // roles privileges
+        final List<Privilege> userPrivileges = Arrays.asList(readCard, readTransaction, readAuth, updateAuth, readBill);
+        final List<Privilege> systemPrivileges = Arrays.asList(writeCard, writeTransaction, writeAuth, readBill, writeBill);
+        final List<Privilege> adminPrivileges = Arrays.asList(updateCard, updateTransaction, readBill, writeBill);
 
         final Role userRole = roleService.getOrSaveRole(new Role("USER", userPrivileges));
         final Role systemRole = roleService.getOrSaveRole(new Role("SYSTEM", systemPrivileges));
         final Role adminRole = roleService.getOrSaveRole(new Role("ADMIN", adminPrivileges));
 
-        final UserDescription userDescriptionA = new UserDescription("user firstname", "user lastname", LocalDate.now(), "Rua abacaxi", 123, "Casa");
+        final UserDescription userDescriptionA = new UserDescription("user firstname", "user lastname", "Rua abacaxi", 123, "Casa");
         final User user = new User(null, "user@gmail.com", "user", true, null, null, userDescriptionA);
         userDescriptionA.setUser(user);
 

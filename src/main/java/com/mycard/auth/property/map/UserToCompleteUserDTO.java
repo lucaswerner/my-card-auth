@@ -13,7 +13,6 @@ public class UserToCompleteUserDTO extends PropertyMap<User, CompleteUserDTO> {
         map().setLastLogin(source.getLastLogin());
         map().setFirstName(source.getUserDescription().getFirstName());
         map().setLastName(source.getUserDescription().getLastName());
-        map().setCcInvoiceDt(source.getUserDescription().getCcInvoiceDt());
         map().setAddressStreet(source.getUserDescription().getAddressStreet());
         map().setAddressNumber(source.getUserDescription().getAddressNumber());
         map().setAddressComplement(source.getUserDescription().getAddressComplement());

@@ -39,7 +39,6 @@ public class UserDescriptionServiceImpl implements UserDescriptionService {
         final UserDescription userDescriptionFromDB = optionalUserDescription.get();
         userDescriptionFromDB.setFirstName(userDescription.getFirstName());
         userDescriptionFromDB.setLastName(userDescription.getLastName());
-        userDescriptionFromDB.setCcInvoiceDt(userDescription.getCcInvoiceDt());
         userDescriptionFromDB.setAddressStreet(userDescription.getAddressStreet());
         userDescriptionFromDB.setAddressNumber(userDescription.getAddressNumber());
         userDescriptionFromDB.setAddressComplement(userDescription.getAddressComplement());

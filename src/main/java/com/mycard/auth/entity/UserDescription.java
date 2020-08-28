@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,9 +26,6 @@ public class UserDescription {
     @Column(name = "register_date", nullable = false)
     private LocalDateTime registerDt = LocalDateTime.now();
 
-    @Column(name = "cc_invoice_dt", nullable = false)
-    private LocalDate ccInvoiceDt;
-
     @Column(name = "address_street", nullable = false)
     private String addressStreet;
 
@@ -43,10 +39,9 @@ public class UserDescription {
     @MapsId
     private User user;
 
-    public UserDescription(String firstName, String lastName, LocalDate ccInvoiceDt, String addressStreet, Integer addressNumber, String addressComplement) {
+    public UserDescription(String firstName, String lastName, String addressStreet, Integer addressNumber, String addressComplement) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.ccInvoiceDt = ccInvoiceDt;
         this.addressStreet = addressStreet;
         this.addressNumber = addressNumber;
         this.addressComplement = addressComplement;
